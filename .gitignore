@@ -6,6 +6,7 @@
 #  Copyright © 2026 Joel Lopes Da Silva. All rights reserved.
 #
 
+/.claude
 /target
 /spoken-word-detection-model/data
 /spoken-word-detection-model/logs
