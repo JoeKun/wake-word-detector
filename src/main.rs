@@ -224,9 +224,15 @@ fn main() -> ! {
     state_machine.start();
 
     // Create two buffers for a Double-buffer DMA setup.
-    // These buffers can hold 1 second of audio, i.e. 16,000 samples (64 KB).
-    let buffer_a = singleton!(: [u32; 16000] = [0u32; 16000]).unwrap();
-    let buffer_b = singleton!(: [u32; 16000] = [0u32; 16000]).unwrap();
+    // These buffers can hold 250ms of audio, i.e. 4,000 samples (16 KB).
+    const DMA_BUFFER_SAMPLES: usize = 4000;
+    let buffer_a = singleton!(: [u32; DMA_BUFFER_SAMPLES] = [0u32; DMA_BUFFER_SAMPLES]).unwrap();
+    let buffer_b = singleton!(: [u32; DMA_BUFFER_SAMPLES] = [0u32; DMA_BUFFER_SAMPLES]).unwrap();
+
+    // Sliding window: 1 second of raw audio (16,000 samples).
+    // Each DMA cycle appends 4,000 new samples, shifting out the oldest 4,000.
+    const AUDIO_WINDOW_SAMPLES: usize = 16000;
+    let audio_window = singleton!(: [u32; AUDIO_WINDOW_SAMPLES] = [0u32; AUDIO_WINDOW_SAMPLES]).unwrap();
 
     let float_audio = singleton!(: [f32; 16000] = [0.0f32; 16000]).unwrap();
     let mel_features = singleton!(: [f32; 97 * 40] = [0.0f32; 97 * 40]).unwrap();
@@ -278,13 +284,19 @@ fn main() -> ! {
             next_dma_transfer,
         ) = dma_transfer.wait();
 
-        // Filled buffer now contains 16,000 raw samples.
+        // Filled buffer now contains 4,000 raw samples.
         // DMA is already filling the other buffer in the background.
 
-        let t0 = timer.get_counter();
+        // Shift the sliding window left by 4,000 samples,
+        // discarding the oldest quarter and making room for the new samples.
+        audio_window.copy_within(DMA_BUFFER_SAMPLES.., 0);
+
+        // Append the new 4,000 samples at the end.
+        audio_window[(AUDIO_WINDOW_SAMPLES - DMA_BUFFER_SAMPLES)..]
+            .copy_from_slice(filled_buffer);
 
         // Convert raw I2S samples to normalized float audio.
-        audio_features::convert_raw_to_float(filled_buffer, float_audio);
+        audio_features::convert_raw_to_float(audio_window, float_audio);
 
         // Extract log mel spectrogram (97 frames * 40 mel bins).
         audio_features::extract_log_mel_spectrogram(float_audio, mel_features);
@@ -296,8 +308,6 @@ fn main() -> ! {
             INPUT_QUANTIZATION_SCALE,
             INPUT_QUANTIZATION_ZERO_POINT,
         );
-
-        let t1 = timer.get_counter();
 
         // Copy quantized features into the model's input tensor.
         let input_ptr = unsafe { tflite::tflite_model_input_data() };
@@ -315,13 +325,6 @@ fn main() -> ! {
         if inference_status != tflite::Status::Ok {
             error!("Inference failed: {:?}", inference_status);
         }
-
-        let t2 = timer.get_counter();
-        info!(
-            "Timing: features={}ms, inference={}ms",
-            (t1 - t0).to_millis(),
-            (t2 - t1).to_millis(),
-        );
 
         // Read output (12 uint8 values).
         let output_ptr = unsafe { tflite::tflite_model_output_data() };
