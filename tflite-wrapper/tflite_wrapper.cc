@@ -21,9 +21,9 @@ extern "C" void tflite_debug_log_string(const char* s);
 // Static storage - no heap allocation needed.
 static const tflite::Model* model = nullptr;
 
-alignas(tflite::MicroMutableOpResolver<7>)
-    static uint8_t resolver_buffer[sizeof(tflite::MicroMutableOpResolver<7>)];
-static tflite::MicroMutableOpResolver<7>* resolver = nullptr;
+alignas(tflite::MicroMutableOpResolver<5>)
+    static uint8_t resolver_buffer[sizeof(tflite::MicroMutableOpResolver<5>)];
+static tflite::MicroMutableOpResolver<5>* resolver = nullptr;
 
 alignas(tflite::MicroInterpreter)
     static uint8_t interpreter_buffer[sizeof(tflite::MicroInterpreter)];
@@ -44,14 +44,12 @@ tflite_status_t tflite_model_init(
         return tflite_status_error_version_mismatch;
     }
 
-    resolver = new (resolver_buffer) tflite::MicroMutableOpResolver<7>();
+    resolver = new (resolver_buffer) tflite::MicroMutableOpResolver<5>();
     resolver->AddConv2D();
     resolver->AddMaxPool2D();
     resolver->AddMean();                // Needed for GlobalAveragePooling2D.
     resolver->AddFullyConnected();
     resolver->AddSoftmax();
-    resolver->AddAdd();
-    resolver->AddMul();
 
     interpreter = new (interpreter_buffer) tflite::MicroInterpreter(
         model, 

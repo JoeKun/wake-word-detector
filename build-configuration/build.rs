@@ -107,8 +107,7 @@ fn main() {
             .compile("tflite_wrapper");
 
         let lib_path = tflite_micro_path
-            // .join("gen/cortex_m_generic_cortex-m33_default_gcc/lib");
-            .join("gen/cortex_m_generic_cortex-m33_release_with_logs_gcc/lib");
+            .join("gen/cortex_m_generic_cortex-m33_release_with_logs_cmsis_nn_gcc/lib");
         println!("cargo:rustc-link-search=native={}", lib_path.display());
         println!("cargo:rustc-link-lib=static=tensorflow-microlite");
 

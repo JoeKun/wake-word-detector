@@ -57,8 +57,8 @@ pub static IMAGE_DEF: hal::block::ImageDef = hal::block::ImageDef::secure_exe();
 /// External high-speed crystal on the Raspberry Pi Pico 2 board is 12 MHz.
 const XTAL_FREQ_HZ: u32 = 12_000_000u32;
 
-const INPUT_QUANTIZATION_SCALE: f32 = 0.07491793483495712;
-const INPUT_QUANTIZATION_ZERO_POINT: i32 = 56;
+const INPUT_QUANTIZATION_SCALE: f32 = 0.07447376847267151;
+const INPUT_QUANTIZATION_ZERO_POINT: i32 = 58;
 const OUTPUT_SCALE: f32 = 0.00390625;
 const OUTPUT_ZERO_POINT: i32 = -128;
 
@@ -231,7 +231,7 @@ fn main() -> ! {
     let float_audio = singleton!(: [f32; 16000] = [0.0f32; 16000]).unwrap();
     let mel_features = singleton!(: [f32; 97 * 40] = [0.0f32; 97 * 40]).unwrap();
     let quantized_features = singleton!(: [i8; 97 * 40] = [0i8; 97 * 40]).unwrap();
-    let tensor_arena = singleton!(: [u8; 256 * 1024] = [0u8; 256 * 1024]).unwrap();
+    let tensor_arena = singleton!(: [u8; 192 * 1024] = [0u8; 192 * 1024]).unwrap();
 
     const MODEL_DATA: &[u8] = include_bytes!(
         "../spoken-word-detection-model/models/model_quantized.tflite"

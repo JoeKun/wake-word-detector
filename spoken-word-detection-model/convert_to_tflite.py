@@ -141,4 +141,4 @@ def convert_to_tflite(
 
 
 if __name__ == "__main__":
-    convert_to_tflite("models/best_model.keras")
+    convert_to_tflite("models/best_model_fused.keras")

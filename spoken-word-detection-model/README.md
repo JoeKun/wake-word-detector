@@ -66,6 +66,7 @@ wake-word-detector/
     │   └── speech_commands/                    # Downloaded dataset
     ├── models/
     │   ├── best_model.keras                    # Best model from training
+    │   ├── best_model_fused.keras              # BatchNormalization fused into Conv2D
     │   ├── final_model.keras                   # Final model
     │   └── model_quantized.tflite              # Int8 quantized TFLite model
     ├── logs/                                   # TensorBoard logs
@@ -76,6 +77,7 @@ wake-word-detector/
     ├── train.py                                # Training script
     ├── evaluate.py                             # Model evaluation and metrics
     ├── test_live.py                            # Live microphone testing
+    ├── fuse_batch_normalization.py             # Fuse BatchNormalization into Conv2D weights
     └── convert_to_tflite.py                    # Convert to TensorFlow Lite
 ```
 
@@ -132,22 +134,30 @@ python evaluate.py
 - ✓ Overall accuracy >92%: Excellent
 
 **Current results:**
-- Test accuracy: **96.96%**
+- Test accuracy: **95.78%**
 - Recommended confidence threshold: **0.7**
-- False positive rate: **0.61%** (at 0.7 threshold)
+- False positive rate: **0.62%** (at 0.7 threshold)
 
-### Step 4: Convert to TensorFlow Lite
+### Step 4: Fuse BatchNormalization into Conv2D
+
+```bash
+python fuse_batch_normalization.py
+```
+
+Fuses the trained BatchNormalization parameters into the preceding Conv2D weights, eliminating BatchNormalization as separate operations. This produces `models/best_model_fused.keras` with identical outputs but fewer layers.
+
+### Step 5: Convert to TensorFlow Lite
 
 ```bash
 python convert_to_tflite.py
 ```
 
-Converts the Keras model to a fully int8 quantized TensorFlow Lite model for embedded deployment:
-- **Input format:** Float32 Keras model (~372 KB)
-- **Output format:** Int8 quantized TFLite model (~105 KB)
+Converts the fused Keras model to a fully int8 quantized TensorFlow Lite model for embedded deployment:
+- **Input format:** Float32 Keras model (~368 KB)
+- **Output format:** Int8 quantized TFLite model (~102 KB)
 - **Quantization:** Full int8 (weights and activations) with representative dataset calibration
 
-### Step 5: Test Live Audio
+### Step 6: Test Live Audio
 
 ```bash
 python test_live.py
@@ -168,9 +178,9 @@ python test_live.py --quantized
 
 ```
 Input: (97, 40, 1) - MFCC features from 1-second audio
-├── Conv2D(32) + BatchNorm + MaxPool + Dropout(0.25)
-├── Conv2D(64) + BatchNorm + MaxPool + Dropout(0.25)
-├── Conv2D(128) + BatchNorm + MaxPool + Dropout(0.25)
+├── Conv2D(32) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
+├── Conv2D(64) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
+├── Conv2D(128) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
 ├── GlobalAveragePooling2D + Dropout(0.5)
 └── Dense(12, softmax) - Output classes
 ```
@@ -190,23 +200,17 @@ Input: (97, 40, 1) - MFCC features from 1-second audio
 
 | Metric | Value |
 |--------|-------|
-| Test Accuracy | 96.96% |
-| Training Accuracy | 95.95% |
-| Validation Accuracy | 96.95% |
-| Model Parameters | 95,116 |
-| Uncompressed Size | 371.55 KB |
-| Quantized Size | 104.8 KB |
+| Test Accuracy | 95.78% |
+| Training Accuracy | 94.53% |
+| Validation Accuracy | 95.62% |
+| Model Parameters | 94,220 |
+| Uncompressed Size | 368.05 KB |
+| Quantized Size | 102.1 KB |
 | Training Time | ~42 minutes (M1 Max GPU) |
 
 ## Next Steps
 
-1. **Deploy to Raspberry Pi Pico:**
-   - Port MFCC extraction to Rust
-   - Integrate TFLite Micro runtime
-   - Connect I2S MEMS microphone
-   - Implement real-time inference
-
-2. **Potential Improvements:**
+1. **Potential Improvements:**
    - Add data augmentation (time stretching, pitch shifting, background noise)
    - Implement "silence" class with synthetic data
    - Tune hyperparameters for better per-class accuracy

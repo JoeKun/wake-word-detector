@@ -12,6 +12,7 @@ from tensorflow import keras
 def create_keyword_spotting_model(
         input_shape: tuple[int, int, int],
         number_of_classes: int,
+        include_batch_normalization: bool = True,
     ) -> keras.Sequential:
     """
     Create a CNN model for keyword spotting.
@@ -28,20 +29,23 @@ def create_keyword_spotting_model(
         keras.layers.Input(shape=input_shape),
 
         # First convolutional block.
-        keras.layers.Conv2D(32, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
+        keras.layers.Conv2D(32, (3, 3), padding="same"),
+        *([ keras.layers.BatchNormalization() ] if include_batch_normalization else []),
+        keras.layers.ReLU(),
         keras.layers.MaxPooling2D((2, 2)),
         keras.layers.Dropout(0.25),
 
         # Second convolutional block.
-        keras.layers.Conv2D(64, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
+        keras.layers.Conv2D(64, (3, 3), padding="same"),
+        *([ keras.layers.BatchNormalization() ] if include_batch_normalization else []),
+        keras.layers.ReLU(),
         keras.layers.MaxPooling2D((2, 2)),
         keras.layers.Dropout(0.25),
 
         # Third convolutional block.
-        keras.layers.Conv2D(128, (3, 3), activation="relu", padding="same"),
-        keras.layers.BatchNormalization(),
+        keras.layers.Conv2D(128, (3, 3), padding="same"),
+        *([ keras.layers.BatchNormalization() ] if include_batch_normalization else []),
+        keras.layers.ReLU(),
         keras.layers.MaxPooling2D((2, 2)),
         keras.layers.Dropout(0.25),
 
