@@ -17,7 +17,7 @@ mod tflite;
 use defmt::*;
 use defmt_rtt as _;
 // use embedded_hal::delay::DelayNs;
-// use embedded_hal::digital::OutputPin;
+use embedded_hal::digital::OutputPin;
 #[cfg(target_arch = "riscv32")]
 use panic_halt as _;
 #[cfg(target_arch = "arm")]
@@ -275,7 +275,11 @@ fn main() -> ! {
     let mut dma_transfer = dma_transfer.write_next(buffer_b);
 
     // Configure GP25 as an output.
-    // let mut led_pin = pins.gpio25.into_push_pull_output();
+    let mut led_pin = pins.gpio25.into_push_pull_output();
+
+    let mut last_detected_class_name: &str = "unknown";
+    let mut last_detected_timestamp = timer.get_counter();
+
     loop {
         // Wait for the active buffer to be completely filled.
         // During this wait, the CPU is free.
@@ -347,12 +351,31 @@ fn main() -> ! {
 
         let confidence = ((max_value as f32) - (OUTPUT_ZERO_POINT as f32)) * OUTPUT_SCALE;
 
-        if max_index < 10 && confidence >= 0.7 {
+        let mut adaptive_confidence_threshold: f32 = 0.7;
+        let current_timestamp = timer.get_counter();
+        if (current_timestamp - last_detected_timestamp).to_millis() > 2000 {
+            last_detected_class_name = "unknown";
+            led_pin.set_low().unwrap();
+        } else {
+            if last_detected_class_name == "six" {
+                adaptive_confidence_threshold = 0.45;
+            }
+        }
+
+        if max_index < 10 && confidence >= adaptive_confidence_threshold {
+            let detected_class_name = CLASS_NAMES[max_index];
             info!(
                 "DETECTED: {} ({}%)",
-                CLASS_NAMES[max_index],
+                detected_class_name,
                 ((confidence * 100.0) as u32),
             );
+
+            if last_detected_class_name == "six" && detected_class_name == "seven" {
+                led_pin.set_high().unwrap();
+            }
+
+            last_detected_class_name = detected_class_name;
+            last_detected_timestamp = current_timestamp;
         } else {
             info!(
                 "(best: {} at {}%)",
@@ -361,25 +384,8 @@ fn main() -> ! {
             );
         }
 
-        // let mut max_amplitude: i32 = 0;
-        // for &raw_sample in filled_buffer.iter() {
-        //     let sample = (raw_sample as i32) >> 14;
-        //     let amplitude = sample.wrapping_abs();
-        //     if amplitude > max_amplitude {
-        //         max_amplitude = amplitude;
-        //     }
-        // }
-        // info!("Peak amplitude: {}", max_amplitude);
-
         // Give the processed buffer back to for the next cycle.
         dma_transfer = next_dma_transfer.write_next(filled_buffer);
-
-        // info!("on!");
-        // led_pin.set_high().unwrap();
-        // timer.delay_ms(200);
-        // info!("off!");
-        // led_pin.set_low().unwrap();
-        // timer.delay_ms(100);
     }
 }
 
