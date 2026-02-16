@@ -9,7 +9,10 @@
 
 use super::mel_constants::{
     HANN_WINDOW, 
-    MEL_FILTERBANK,
+    MEL_BIN_STARTS,
+    MEL_BIN_LENGTHS,
+    MEL_BIN_OFFSETS,
+    MEL_WEIGHTS,
 };
 
 use microfft::real::rfft_512;
@@ -83,13 +86,16 @@ pub fn extract_log_mel_spectrogram(
         let nyquist_bin_value = spectrum[0].im;
         magnitude[NUMBER_OF_FFT_BINS - 1] = libm::fabsf(nyquist_bin_value);
 
-        // --- Step D: Apply mel filterbank ---
-        // Matrix-vector multiply: mel[j] = sum_i(magnitude[i] * MEL_FILTERBANK[i * 40 + j])
+        // --- Step D: Apply sparse mel filterbank ---
+        // For each mel bin, accumulate only the non-zero filter weights.
         let mel_offset = frame_index * NUMBER_OF_MEL_BINS;
         for j in 0..NUMBER_OF_MEL_BINS {
             let mut sum = 0.0f32;
-            for i in 0..NUMBER_OF_FFT_BINS {
-                sum += magnitude[i] * MEL_FILTERBANK[i * NUMBER_OF_MEL_BINS + j];
+            let start = MEL_BIN_STARTS[j];
+            let offset = MEL_BIN_OFFSETS[j];
+            let length = MEL_BIN_LENGTHS[j];
+            for k in 0..length {
+                sum += magnitude[start + k] * MEL_WEIGHTS[offset + k];
             }
             // --- Step E: Log scaling ---
             output[mel_offset + j] = libm::logf(sum + LOG_EPSILON);

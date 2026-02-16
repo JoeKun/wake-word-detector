@@ -6,6 +6,7 @@
 #  Copyright © 2026 Joel Lopes Da Silva. All rights reserved.
 #
 
+import numpy as np
 import tensorflow as tf
 
 hann = tf.signal.hann_window(512, periodic=True).numpy()
@@ -18,6 +19,36 @@ mel_matrix = tf.signal.linear_to_mel_weight_matrix(
     lower_edge_hertz=80.0,
     upper_edge_hertz=7600.0,
 ).numpy()
+
+# Analyze sparsity: for each mel bin (column),
+# find the range of non-zero FFT bins.
+number_of_frequency_bins, number_of_mel_bins = mel_matrix.shape
+mel_bin_starts = []
+mel_bin_lengths = []
+all_weights = []
+
+for mel_bin_index in range(number_of_mel_bins):
+    column = mel_matrix[:, mel_bin_index]
+    non_zero_indices = np.nonzero(column)[0]
+    if len(non_zero_indices) == 0:
+        mel_bin_starts.append(0)
+        mel_bin_lengths.append(0)
+    else:
+        start = int(non_zero_indices[0])
+        end = int(non_zero_indices[-1]) + 1
+        mel_bin_starts.append(start)
+        mel_bin_lengths.append(end - start)
+        all_weights.extend(column[start:end].tolist())
+
+# Compute offsets into the packed weights array.
+mel_bin_offsets = []
+offset = 0
+for length in mel_bin_lengths:
+    mel_bin_offsets.append(offset)
+    offset += length
+
+total_weights = len(all_weights)
+print(f"Sparse mel filterbank: {total_weights} non-zero weights out of {number_of_frequency_bins * number_of_mel_bins} total ({100 * total_weights / (number_of_frequency_bins * number_of_mel_bins):.1f}%)")
 
 with open("../src/mel_constants.rs", "w") as file:
     file.write("/*\n")
@@ -32,20 +63,38 @@ with open("../src/mel_constants.rs", "w") as file:
     file.write(" *\n")
     file.write(" */\n")
     file.write("\n")
+
     file.write("/// Periodic Hann window (512 coefficients).\n")
     file.write("pub const HANN_WINDOW: [f32; 512] = [\n")
     for value in hann:
         file.write(f"    {value:.8f},\n")
     file.write("];\n")
     file.write("\n")
-    file.write("/// Mel filterbank (257 rows × 40 columns, row-major).\n")
-    file.write("pub const MEL_FILTERBANK: [f32; 10280] = [\n")
-    file.write("\n")
-    number_of_frequency_bins, number_of_mel_bins = mel_matrix.shape
-    for frequency_bin_index in range(number_of_frequency_bins):
-        file.write(f"    // Frequency bin {frequency_bin_index}\n")
-        for mel_bin_index in range(number_of_mel_bins):
-            value = mel_matrix[frequency_bin_index, mel_bin_index]
-            file.write(f"    {value:.8f},\n")
-        file.write("\n")
+
+    file.write(f"/// Sparse mel filterbank: first non-zero FFT bin for each of the {number_of_mel_bins} mel bins.\n")
+    file.write(f"pub const MEL_BIN_STARTS: [usize; {number_of_mel_bins}] = [\n")
+    for value in mel_bin_starts:
+        file.write(f"    {value},\n")
     file.write("];\n")
+    file.write("\n")
+
+    file.write(f"/// Sparse mel filterbank: number of non-zero weights for each mel bin.\n")
+    file.write(f"pub const MEL_BIN_LENGTHS: [usize; {number_of_mel_bins}] = [\n")
+    for value in mel_bin_lengths:
+        file.write(f"    {value},\n")
+    file.write("];\n")
+    file.write("\n")
+
+    file.write(f"/// Sparse mel filterbank: offset into MEL_WEIGHTS for each mel bin.\n")
+    file.write(f"pub const MEL_BIN_OFFSETS: [usize; {number_of_mel_bins}] = [\n")
+    for value in mel_bin_offsets:
+        file.write(f"    {value},\n")
+    file.write("];\n")
+    file.write("\n")
+
+    file.write(f"/// Sparse mel filterbank: packed non-zero weights ({total_weights} values).\n")
+    file.write(f"pub const MEL_WEIGHTS: [f32; {total_weights}] = [\n")
+    for value in all_weights:
+        file.write(f"    {value:.8f},\n")
+    file.write("];\n")
+    file.write("\n")
