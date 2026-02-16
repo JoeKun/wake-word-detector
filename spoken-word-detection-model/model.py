@@ -36,14 +36,16 @@ def create_keyword_spotting_model(
         keras.layers.Dropout(0.25),
 
         # Second convolutional block.
-        keras.layers.Conv2D(64, (3, 3), padding="same"),
+        keras.layers.DepthwiseConv2D((3, 3), padding="same", use_bias=False),
+        keras.layers.Conv2D(64, (1, 1)),
         *([ keras.layers.BatchNormalization() ] if include_batch_normalization else []),
         keras.layers.ReLU(),
         keras.layers.MaxPooling2D((2, 2)),
         keras.layers.Dropout(0.25),
 
         # Third convolutional block.
-        keras.layers.Conv2D(128, (3, 3), padding="same"),
+        keras.layers.DepthwiseConv2D((3, 3), padding="same", use_bias=False),
+        keras.layers.Conv2D(128, (1, 1)),
         *([ keras.layers.BatchNormalization() ] if include_batch_normalization else []),
         keras.layers.ReLU(),
         keras.layers.MaxPooling2D((2, 2)),

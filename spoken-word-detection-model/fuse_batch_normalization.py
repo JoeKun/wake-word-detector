@@ -75,10 +75,26 @@ def create_fused_model(model: keras.Sequential) -> keras.Sequential:
     # Set fused weights on each Conv2D.
     fused_conv_layers = [
         layer
-        for layer in fused_model.layers if isinstance(layer, keras.layers.Conv2D)
+        for layer in fused_model.layers
+        if isinstance(layer, keras.layers.Conv2D)
+        and not isinstance(layer, keras.layers.DepthwiseConv2D)
     ]
     for conv_layer, (w, b) in zip(fused_conv_layers, fused_weights):
         conv_layer.set_weights([w, b])
+
+    # Copy DepthwiseConv2D weights unchanged.
+    original_depthwise_layers = [
+        layer
+        for layer in model.layers
+        if isinstance(layer, keras.layers.DepthwiseConv2D)
+    ]
+    fused_depthwise_layers = [
+        layer
+        for layer in fused_model.layers
+        if isinstance(layer, keras.layers.DepthwiseConv2D)
+    ]
+    for original_depthwise_layer, fused_depthwise_layer in zip(original_depthwise_layers, fused_depthwise_layers):
+        fused_depthwise_layer.set_weights(original_depthwise_layer.get_weights())
 
     # Copy the Dense layer weights unchanged.
     original_dense = model.layers[-1]

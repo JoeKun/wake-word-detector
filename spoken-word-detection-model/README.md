@@ -134,9 +134,9 @@ python evaluate.py
 - ✓ Overall accuracy >92%: Excellent
 
 **Current results:**
-- Test accuracy: **95.78%**
+- Test accuracy: **92.49%**
 - Recommended confidence threshold: **0.7**
-- False positive rate: **0.62%** (at 0.7 threshold)
+- False positive rate: **0.94%** (at 0.7 threshold)
 
 ### Step 4: Fuse BatchNormalization into Conv2D
 
@@ -153,8 +153,8 @@ python convert_to_tflite.py
 ```
 
 Converts the fused Keras model to a fully int8 quantized TensorFlow Lite model for embedded deployment:
-- **Input format:** Float32 Keras model (~368 KB)
-- **Output format:** Int8 quantized TFLite model (~102 KB)
+- **Input format:** Float32 Keras model (~51 KB)
+- **Output format:** Int8 quantized TFLite model (~27 KB)
 - **Quantization:** Full int8 (weights and activations) with representative dataset calibration
 
 ### Step 6: Test Live Audio
@@ -179,8 +179,8 @@ python test_live.py --quantized
 ```
 Input: (97, 40, 1) - MFCC features from 1-second audio
 ├── Conv2D(32) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
-├── Conv2D(64) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
-├── Conv2D(128) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
+├── DepthwiseConv2D(3x3) + Conv2D(64, 1x1) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
+├── DepthwiseConv2D(3x3) + Conv2D(128, 1x1) + BatchNormalization + ReLU + MaxPool + Dropout(0.25)
 ├── GlobalAveragePooling2D + Dropout(0.5)
 └── Dense(12, softmax) - Output classes
 ```
@@ -200,12 +200,12 @@ Input: (97, 40, 1) - MFCC features from 1-second audio
 
 | Metric | Value |
 |--------|-------|
-| Test Accuracy | 95.78% |
-| Training Accuracy | 94.53% |
-| Validation Accuracy | 95.62% |
-| Model Parameters | 94,220 |
-| Uncompressed Size | 368.05 KB |
-| Quantized Size | 102.1 KB |
+| Test Accuracy | 92.49% |
+| Training Accuracy | 89.68% |
+| Validation Accuracy | 92.45% |
+| Model Parameters | 13,164 |
+| Uncompressed Size | 51.42 KB |
+| Quantized Size | 26.7 KB |
 | Training Time | ~42 minutes (M1 Max GPU) |
 
 ## Next Steps
