@@ -106,14 +106,14 @@ def predict_word_tflite(
     
     # Quantize input if the model expects int8.
     input_dtype = input_details[0]["dtype"]
-    if input_dtype == np.int8:
+    if input_dtype in (np.int8, np.uint8):
         # Get quantization parameters.
         input_scale = input_details[0]["quantization"][0]
         input_zero_point = input_details[0]["quantization"][1]
         
         # Quantize: float_value = (quantized_value - zero_point) * scale.
         # So: quantized_value = float_value / scale + zero_point.
-        mfcc_quantized = (mfcc / input_scale + input_zero_point).astype(np.int8)
+        mfcc_quantized = (mfcc / input_scale + input_zero_point).astype(input_dtype)
         input_data = mfcc_quantized
     else:
         input_data = mfcc.astype(np.float32)
@@ -127,7 +127,7 @@ def predict_word_tflite(
     
     # Dequantize output if needed.
     output_dtype = output_details[0]["dtype"]
-    if output_dtype == np.int8:
+    if output_dtype in (np.int8, np.uint8):
         output_scale = output_details[0]["quantization"][0]
         output_zero_point = output_details[0]["quantization"][1]
         probabilities = (output_data.astype(np.float32) - output_zero_point) * output_scale

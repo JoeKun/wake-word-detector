@@ -33,7 +33,7 @@
           ]
         }
       ],
-      "preLaunchTask": "Build + Generate SBOM (debug)",
+      "preLaunchTask": "Build + Generate SBOM",
       "consoleLogLevel": "Debug",
       "wireProtocol": "Swd"
     }

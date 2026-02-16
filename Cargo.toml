@@ -13,8 +13,19 @@ edition = "2024"
 license = "MIT or Apache-2.0"
 build = "build-configuration/build.rs"
 
+[profile.dev]
+# The real-time audio processing code in this program requires
+# a certain level of optimizations to avoid things like:
+#   - every array access having a bounds check;
+#   - every integer operation checking for overflow;
+#   - no function inlining (may be relevant for libm::sqrtf and FFT);
+#   - no loop unrolling or constant folding;
+#   - the FPU not being used for some operations.
+opt-level = 2
+
 [build-dependencies]
 regex = "1.11.0"
+cc = "1.2"
 
 [dependencies]
 cortex-m = "0.7"
@@ -22,6 +33,9 @@ cortex-m-rt = "0.7"
 embedded-hal = "1.0.0"
 defmt = "1"
 defmt-rtt = "1"
+pio = "0.3.0"
+microfft = "0.6"    # no_std 512-point real FFT
+libm = "0.2"        # sqrtf, logf for no_std
 
 [target.'cfg( target_arch = "arm" )'.dependencies]
 panic-probe = { version = "1", features = ["print-defmt"] }

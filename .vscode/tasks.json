@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Compile Project",
+      "label": "Compile Project (release)",
       "type": "process",
       "isBuildCommand": true,
       "command": "cargo",
@@ -12,7 +12,7 @@
       ],
       "group": {
         "kind": "build",
-        "isDefault": true
+        "isDefault": false
       },
       "presentation": {
         "reveal": "always",
@@ -45,7 +45,7 @@
           "cargo sbom | Set-Content -Encoding utf8 ${command:raspberry-pi-pico.sbomTargetPathRelease}"
         ]
       },
-      "dependsOn": "Compile Project",
+      "dependsOn": "Compile Project (release)",
       "presentation": {
         "reveal": "silent",
         "panel": "shared"
@@ -53,7 +53,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Compile Project (debug)",
+      "label": "Compile Project",
       "type": "process",
       "isBuildCommand": true,
       "command": "cargo",
@@ -62,7 +62,7 @@
       ],
       "group": {
         "kind": "build",
-        "isDefault": false
+        "isDefault": true
       },
       "presentation": {
         "reveal": "always",
@@ -78,7 +78,7 @@
       }
     },
     {
-      "label": "Build + Generate SBOM (debug)",
+      "label": "Build + Generate SBOM",
       "type": "shell",
       "command": "bash",
       "args": [
@@ -95,7 +95,7 @@
           "cargo sbom | Set-Content -Encoding utf8 ${command:raspberry-pi-pico.sbomTargetPathDebug}"
         ]
       },
-      "dependsOn": "Compile Project (debug)",
+      "dependsOn": "Compile Project",
       "presentation": {
         "reveal": "silent",
         "panel": "shared"
@@ -106,7 +106,7 @@
       "label": "Run Project",
       "type": "process",
       "dependsOn": [
-        "Build + Generate SBOM (debug)"
+        "Build + Generate SBOM"
       ],
       "command": "probe-rs",
       "args": [
