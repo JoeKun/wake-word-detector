@@ -48,7 +48,7 @@ SECTIONS {
 _stext = ADDR(.start_block) + SIZEOF(.start_block);
 
 SECTIONS {
-    /* ### Picotool 'Binary Info' Entries
+    /* ### Picotool "Binary Info" Entries
      *
      * Picotool looks through this block (as we have pointers to it in our
      * header) to find interesting information.

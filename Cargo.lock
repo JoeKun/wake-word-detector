@@ -150,7 +150,7 @@ checksum = "e37549a379a9e0e6e576fd208ee60394ccb8be963889eebba3ffe0980364f472"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -160,15 +160,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "59ed5838eebb26a2bb2e58f6d5b5316989ae9d08bab10e0e6d103e656d1b0280"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "crc-any"
-version = "2.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a62ec9ff5f7965e4d7280bd5482acd20aadb50d632cf6c1d74493856b011fa73"
-dependencies = [
- "debug-helper",
 ]
 
 [[package]]
@@ -186,12 +177,6 @@ dependencies = [
  "generic-array",
  "typenum",
 ]
-
-[[package]]
-name = "debug-helper"
-version = "0.3.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f578e8e2c440e7297e008bb5486a3a8a194775224bbc23729b0dbdfaeebf162e"
 
 [[package]]
 name = "defmt"
@@ -213,7 +198,7 @@ dependencies = [
  "proc-macro-error2",
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -352,7 +337,7 @@ checksum = "a0b4095fc99e1d858e5b8c7125d2638372ec85aa0fe6c807105cf10b0265ca6c"
 dependencies = [
  "frunk_proc_macro_helpers",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -364,7 +349,7 @@ dependencies = [
  "frunk_core",
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -425,15 +410,6 @@ checksum = "7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017"
 dependencies = [
  "equivalent",
  "hashbrown",
-]
-
-[[package]]
-name = "itertools"
-version = "0.10.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
-dependencies = [
- "either",
 ]
 
 [[package]]
@@ -596,14 +572,8 @@ checksum = "ff32365de1b6743cb203b710788263c44a03de03802daf96092f2da4fe6ba4d7"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
-
-[[package]]
-name = "panic-halt"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a513e167849a384b7f9b746e517604398518590a9142f4846a32e3c2a4de7b11"
 
 [[package]]
 name = "panic-probe"
@@ -714,7 +684,7 @@ dependencies = [
  "proc-macro-error2",
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -748,7 +718,7 @@ dependencies = [
  "proc-macro-error-attr2",
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -841,7 +811,7 @@ checksum = "30f19a85fe107b65031e0ba8ec60c34c2494069fe910d6c297f5e7cb5a6f76d0"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -857,70 +827,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8288358786b1458fb2caac8c4b40fb529ef4200d6c46467e2695b7a8ba573ae8"
 dependencies = [
  "fugit",
-]
-
-[[package]]
-name = "rp2040-boot2"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c92f344f63f950ee36cf4080050e4dce850839b9175da38f9d2ffb69b4dbb21"
-dependencies = [
- "crc-any",
-]
-
-[[package]]
-name = "rp2040-hal"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b01f11995e606dd13b07f3fb80686149e5b8bbbab21fc4af437a9978f1a783f"
-dependencies = [
- "bitfield 0.14.0",
- "cortex-m",
- "critical-section",
- "embedded-dma",
- "embedded-hal 0.2.7",
- "embedded-hal 1.0.0",
- "embedded-hal-async",
- "embedded-hal-nb",
- "embedded-io",
- "frunk",
- "fugit",
- "itertools 0.10.5",
- "nb 1.1.0",
- "paste",
- "pio",
- "rand_core",
- "rp-binary-info",
- "rp-hal-common",
- "rp2040-hal-macros",
- "rp2040-pac",
- "usb-device",
- "vcell",
- "void",
-]
-
-[[package]]
-name = "rp2040-hal-macros"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86479063e497efe1ae81995ef9071f54fd1c7427e04d6c5b84cde545ff672a5e"
-dependencies = [
- "cortex-m-rt",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "rp2040-pac"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83cbcd3f7a0ca7bbe61dc4eb7e202842bee4e27b769a7bf3a4a72fa399d6e404"
-dependencies = [
- "cortex-m",
- "cortex-m-rt",
- "critical-section",
- "vcell",
 ]
 
 [[package]]
@@ -967,7 +873,7 @@ checksum = "74edd7a5979e9763bbb98e9746e711bac7464ee3397af7288e6c288ff0d3c764"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -1087,17 +993,6 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.109"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
-dependencies = [
- "proc-macro2",
- "quote",
- "unicode-ident",
-]
-
-[[package]]
-name = "syn"
 version = "2.0.116"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3df424c70518695237746f84cede799c9c58fcb37450d7b23716568cc8bc69cb"
@@ -1142,7 +1037,7 @@ checksum = "ebc4ee7f67670e9b64d05fa4253e753e016c6c95ff35b89b7941d6b856dec1d5"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.116",
+ "syn",
 ]
 
 [[package]]
@@ -1213,17 +1108,16 @@ dependencies = [
  "cc",
  "cortex-m",
  "cortex-m-rt",
+ "critical-section",
  "defmt",
  "defmt-rtt",
  "embedded-hal 1.0.0",
  "libm",
  "microfft",
- "panic-halt",
+ "num_enum",
  "panic-probe",
  "pio",
  "regex",
- "rp2040-boot2",
- "rp2040-hal",
  "rp235x-hal",
 ]
 

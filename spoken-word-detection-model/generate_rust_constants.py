@@ -50,9 +50,9 @@ for length in mel_bin_lengths:
 total_weights = len(all_weights)
 print(f"Sparse mel filterbank: {total_weights} non-zero weights out of {number_of_frequency_bins * number_of_mel_bins} total ({100 * total_weights / (number_of_frequency_bins * number_of_mel_bins):.1f}%)")
 
-with open("../src/mel_constants.rs", "w") as file:
+with open("../src/audio/mel_constants.rs", "w") as file:
     file.write("/*\n")
-    file.write(" *  mel_constants.rs\n")
+    file.write(" *  audio/mel_constants.rs\n")
     file.write(" *  wake-word-detector\n")
     file.write(" *\n")
     file.write(" *  Created by Joel Lopes Da Silva on 2/14/26.\n")

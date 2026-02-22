@@ -7,7 +7,7 @@ A machine learning project to train a keyword spotting model for embedded deploy
 This project trains a convolutional neural network (CNN) to recognize specific wake words from audio input.
 The model is designed to run on resource-constrained embedded devices like the Raspberry Pi Pico.
 
-**Target words:** six, seven, up, down, right, left, on, off, wow, happy
+**Target words:** up, down, right, left, on, off, six, seven, wow, happy  
 **Additional classes:** unknown (other words), silence
 
 ## Requirements
@@ -110,7 +110,7 @@ python train.py
 - Without GPU: ~3-5 minutes per epoch
 
 **Callbacks:**
-- Early stopping: Stops if validation loss doesn't improve for 10 epochs
+- Early stopping: Stops if validation loss doesn’t improve for 10 epochs
 - Model checkpoint: Saves best model based on validation accuracy
 - Learning rate reduction: Reduces LR by 50% if validation loss plateaus
 - TensorBoard: Logs training metrics
@@ -163,7 +163,7 @@ Converts the fused Keras model to a fully int8 quantized TensorFlow Lite model f
 python test_live.py
 ```
 
-Interactive testing with your Mac's microphone:
+Interactive testing with your Mac’s microphone:
 1. Press Enter to start recording
 2. Speak a wake word
 3. See the prediction and confidence score

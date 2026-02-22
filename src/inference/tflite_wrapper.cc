@@ -1,5 +1,5 @@
 /*
- *  tflite-wrapper/tflite_wrapper.cc
+ *  inference/tflite_wrapper.cc
  *  wake-word-detector
  *
  *  Created by Joel Lopes Da Silva on 2/15/26.

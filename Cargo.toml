@@ -23,6 +23,11 @@ build = "build-configuration/build.rs"
 #   - the FPU not being used for some operations.
 opt-level = 2
 
+[profile.release]
+# Include full DWARF debug symbols alongside optimized code.
+# probe-rs uses these to decode RTT log locations.
+debug = 2
+
 [build-dependencies]
 regex = "1.11.0"
 cc = "1.2"
@@ -30,25 +35,13 @@ cc = "1.2"
 [dependencies]
 cortex-m = "0.7"
 cortex-m-rt = "0.7"
+critical-section = "1.0"
+rp235x-hal = { version = "0.4", features = ["rt", "critical-section-impl"] }
 embedded-hal = "1.0.0"
 defmt = "1"
 defmt-rtt = "1"
+panic-probe = { version = "1", features = ["print-defmt"] }
 pio = "0.3.0"
 microfft = "0.6"    # no_std 512-point real FFT
 libm = "0.2"        # sqrtf, logf for no_std
-
-[target.'cfg( target_arch = "arm" )'.dependencies]
-panic-probe = { version = "1", features = ["print-defmt"] }
-
-[target.'cfg( target_arch = "riscv32" )'.dependencies]
-panic-halt = { version = "1.0.0" }
-
-[target."thumbv8m.main-none-eabihf".dependencies]
-rp235x-hal = { version = "0.4", features = ["rt", "critical-section-impl"] }
-
-[target.riscv32imac-unknown-none-elf.dependencies]
-rp235x-hal = { version = "0.4", features = ["rt", "critical-section-impl"] }
-
-[target.thumbv6m-none-eabi.dependencies]
-rp2040-boot2 = "0.3"
-rp2040-hal = { version = "0.12", features = ["rt", "critical-section-impl"] }
+num_enum = { version = "0.7", default-features = false }

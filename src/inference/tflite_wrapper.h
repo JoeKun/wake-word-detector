@@ -1,5 +1,5 @@
 /*
- *  tflite-wrapper/tflite_wrapper.h
+ *  inference/tflite_wrapper.h
  *  wake-word-detector
  *
  *  Created by Joel Lopes Da Silva on 2/15/26.
@@ -35,21 +35,21 @@ tflite_status_t tflite_model_init(
 // Returns the number of bytes used in the tensor arena.
 size_t tflite_model_arena_used(void);
 
-// Returns a pointer to the input tensor's data buffer.
+// Returns a pointer to the input tensor’s data buffer.
 // Caller copies int8 features here before calling invoke.
 int8_t* tflite_model_input_data(void);
 
-// Returns the input tensor's size in bytes.
+// Returns the input tensor’s size in bytes.
 size_t tflite_model_input_size(void);
 
 // Run inference. Returns `tflite_status_ok` on success.
 tflite_status_t tflite_model_invoke(void);
 
-// Returns a pointer to the output tensor's data buffer
+// Returns a pointer to the output tensor’s data buffer
 // (12 int8 values).
 const int8_t* tflite_model_output_data(void);
 
-// Returns the output tensor's size in bytes.
+// Returns the output tensor’s size in bytes.
 size_t tflite_model_output_size(void);
 
 #ifdef __cplusplus

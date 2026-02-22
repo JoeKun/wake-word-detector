@@ -1,5 +1,5 @@
 /*
- *  mel_constants.rs
+ *  audio/mel_constants.rs
  *  wake-word-detector
  *
  *  Created by Joel Lopes Da Silva on 2/14/26.
