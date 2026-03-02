@@ -44,4 +44,12 @@ unsafe extern "C" {
     pub fn tflite_model_output_data() -> *const i8;
 
     pub fn tflite_model_output_size() -> usize;
+
+    pub fn tflite_model_input_scale() -> f32;
+
+    pub fn tflite_model_input_zero_point() -> i32;
+
+    pub fn tflite_model_output_scale() -> f32;
+
+    pub fn tflite_model_output_zero_point() -> i32;
 }

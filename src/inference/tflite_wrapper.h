@@ -52,6 +52,18 @@ const int8_t* tflite_model_output_data(void);
 // Returns the output tensor’s size in bytes.
 size_t tflite_model_output_size(void);
 
+// Returns the input tensor’s quantization scale.
+float tflite_model_input_scale(void);
+
+// Returns the input tensor’s quantization zero point.
+int32_t tflite_model_input_zero_point(void);
+
+// Returns the output tensor’s quantization scale.
+float tflite_model_output_scale(void);
+
+// Returns the output tensor’s quantization zero point.
+int32_t tflite_model_output_zero_point(void);
+
 #ifdef __cplusplus
 }
 #endif

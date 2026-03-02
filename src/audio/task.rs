@@ -26,11 +26,6 @@ use crate::hardware_resources::FunctionPioPin;
 use crate::output;
 use crate::inference::tflite;
 
-const INPUT_QUANTIZATION_SCALE: f32 = 0.07350979000329971;
-const INPUT_QUANTIZATION_ZERO_POINT: i32 = 60;
-const OUTPUT_SCALE: f32 = 0.00390625;
-const OUTPUT_ZERO_POINT: i32 = -128;
-
 pub struct MicrophoneResources {
 
     // Pins.
@@ -177,6 +172,20 @@ pub fn run(microphone_resources: MicrophoneResources) -> ! {
         tensor_arena.len(),
     );
 
+    // Read quantization parameters from the model itself.
+    let input_quantization_scale = unsafe {
+        tflite::tflite_model_input_scale()
+    };
+    let input_quantization_zero_point = unsafe {
+        tflite::tflite_model_input_zero_point()
+    };
+    let output_scale = unsafe {
+        tflite::tflite_model_output_scale()
+    };
+    let output_zero_point = unsafe {
+        tflite::tflite_model_output_zero_point()
+    };
+
     // Start filling buffer_a using channels 0 and 1.
     let dma_configuration = double_buffer::Config::new(
         (dma_channels.ch0, dma_channels.ch1), 
@@ -219,8 +228,8 @@ pub fn run(microphone_resources: MicrophoneResources) -> ! {
         features::quantize_features(
             mel_features,
             quantized_features,
-            INPUT_QUANTIZATION_SCALE,
-            INPUT_QUANTIZATION_ZERO_POINT,
+            input_quantization_scale,
+            input_quantization_zero_point,
         );
 
         // Copy quantized features into the model’s input tensor.
@@ -265,7 +274,7 @@ pub fn run(microphone_resources: MicrophoneResources) -> ! {
             .unwrap_or(DetectableWord::Unknown);
 
         // Calculate confidence level.
-        let confidence = ((max_value as f32) - (OUTPUT_ZERO_POINT as f32)) * OUTPUT_SCALE;
+        let confidence = ((max_value as f32) - (output_zero_point as f32)) * output_scale;
 
         // Pass the detected word and the confidence level to the output controller.
         output::controller::handle_detected_word(detected_word, confidence);

@@ -105,3 +105,27 @@ size_t tflite_model_output_size(void) {
     return interpreter->output(0)->bytes;
 }
 
+extern "C"
+float tflite_model_input_scale(void) {
+    if (interpreter == nullptr) return 0.0f;
+    return interpreter->input(0)->params.scale;
+}
+
+extern "C"
+int32_t tflite_model_input_zero_point(void) {
+    if (interpreter == nullptr) return 0;
+    return interpreter->input(0)->params.zero_point;
+}
+
+extern "C"
+float tflite_model_output_scale(void) {
+    if (interpreter == nullptr) return 0.0f;
+    return interpreter->output(0)->params.scale;
+}
+
+extern "C"
+int32_t tflite_model_output_zero_point(void) {
+    if (interpreter == nullptr) return 0;
+    return interpreter->output(0)->params.zero_point;
+}
+
